@@ -1,5 +1,9 @@
 package com.algaworks.algadelivery.courier.management.domain.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.time.OffsetDateTime;
@@ -11,9 +15,11 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter(AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 public class Courier {
 
+    @Id
     @EqualsAndHashCode.Include
     private UUID id;
 
@@ -29,6 +35,7 @@ public class Courier {
 
     private OffsetDateTime lastFulfilledDeliveryAt;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "courier")
     private List<AssignedDelivery> pedingDeliveries = new ArrayList<>();
 
     public List<AssignedDelivery> getPedingDeliveries() {
@@ -46,7 +53,7 @@ public class Courier {
     }
 
     public void assign(UUID deliveryId) {
-        this.pedingDeliveries.add(AssignedDelivery.peding(deliveryId));
+        this.pedingDeliveries.add(AssignedDelivery.peding(deliveryId, this));
         this.pedingDeliveriesQuantity++;
     }
 
